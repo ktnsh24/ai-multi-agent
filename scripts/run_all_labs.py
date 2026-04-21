@@ -34,6 +34,9 @@ BASE_URLS: dict[str, str] = {
 
 RESULTS_DIR = Path(__file__).parent / "lab_results"
 
+SERVER_RECOVERY_MAX_WAIT = 120
+SERVER_RECOVERY_INTERVAL = 5
+
 
 @dataclass
 class LabResult:
@@ -46,6 +49,38 @@ class LabResult:
 
 
 # ---------------------------------------------------------------------------
+# Server crash resilience
+# ---------------------------------------------------------------------------
+def _wait_for_server(base_url: str, context: str = "") -> bool:
+    """Wait for the server to become healthy again after a crash."""
+    label = f" (after {context})" if context else ""
+    print(f"\n    🔄 Server unreachable{label} — waiting for recovery...", flush=True)
+    elapsed = 0
+    while elapsed < SERVER_RECOVERY_MAX_WAIT:
+        time.sleep(SERVER_RECOVERY_INTERVAL)
+        elapsed += SERVER_RECOVERY_INTERVAL
+        try:
+            resp = httpx.get(f"{base_url}/health", timeout=5)
+            if resp.status_code == 200:
+                print(f"    ✅ Server recovered after {elapsed}s", flush=True)
+                return True
+        except Exception:
+            pass
+        print(f"    ⏳ Still waiting... ({elapsed}s / {SERVER_RECOVERY_MAX_WAIT}s)", flush=True)
+    print(f"    ❌ Server did not recover within {SERVER_RECOVERY_MAX_WAIT}s", flush=True)
+    return False
+
+
+def _is_connection_error(e: Exception) -> bool:
+    """Check if an exception is a server connection/crash error."""
+    msg = str(e).lower()
+    return any(pattern in msg for pattern in [
+        "connection refused", "server disconnected", "connection reset",
+        "connection closed", "remotedisconnected", "broken pipe", "eof occurred",
+    ])
+
+
+# ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 def api(
@@ -54,12 +89,21 @@ def api(
     path: str,
     *,
     json_body: dict | None = None,
+    max_retries: int = 2,
 ) -> httpx.Response:
-    fn = getattr(client, method.lower())
-    kwargs: dict = {}
-    if json_body is not None:
-        kwargs["json"] = json_body
-    return fn(path, **kwargs)
+    base_url = str(client.base_url).rstrip("/")
+    for attempt in range(max_retries + 1):
+        try:
+            fn = getattr(client, method.lower())
+            kwargs: dict = {}
+            if json_body is not None:
+                kwargs["json"] = json_body
+            return fn(path, **kwargs)
+        except Exception as e:
+            if _is_connection_error(e) and attempt < max_retries:
+                if _wait_for_server(base_url, context=f"{path}, attempt {attempt + 1}"):
+                    continue
+            raise
 
 
 def check(result: LabResult, name: str, passed: bool, notes: str = "") -> None:
@@ -327,6 +371,10 @@ def run_labs(base_url: str, env: str, only: list[int] | None = None, dry_run: bo
             except Exception as e:
                 print(f"  Lab {num}: ERROR — {e}")
                 failed += 1
+                if _is_connection_error(e):
+                    if not _wait_for_server(base_url, context=f"lab {num} failure"):
+                        print("  ⛔ Aborting remaining labs — server unrecoverable")
+                        break
 
     print(f"\nResults: {passed} passed, {failed} failed")
     print(f"Details: {RESULTS_DIR / env}/")

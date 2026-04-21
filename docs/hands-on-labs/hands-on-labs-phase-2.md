@@ -15,12 +15,12 @@
 
 ## 🫏 The Donkey Analogy — Understanding Phase 2 Real-Time Orchestration
 
-Now the relay team performs in a live stadium:
-
-- WebSocket is the live commentary channel.
-- REST API is the official scoreboard of task status.
-- Frontend dashboard is the audience view of events and results.
-- Docker stack recreates the same stadium anywhere.
+| Metric | 🫏 Donkey Analogy | What It Means for Multi-Agent | How It's Calculated |
+|--------|-------------------|-------------------------------|---------------------|
+| **WebSocket Events** | Live commentary channel — hear every play as it happens | Real-time agent events streamed to the frontend as they occur | Connect `ws://` → count event frames → verify agent-step events arrive in order |
+| **REST API** | Official scoreboard of task status | Standard async task pattern: submit → poll → retrieve result | `POST /tasks` → `GET /tasks/{id}` → check status field + result payload |
+| **Frontend Dashboard** | Audience view of events and results | User-facing UI showing live agent progress and final output | Load dashboard → verify WebSocket connection → check event rendering |
+| **Docker Stack** | Recreates the same stadium anywhere | Multi-service deployment (orchestrator + agents + frontend + DB) | `docker compose up` → verify all services healthy → run end-to-end task |
 
 ---
 

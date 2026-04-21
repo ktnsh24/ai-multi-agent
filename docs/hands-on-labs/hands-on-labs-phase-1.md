@@ -60,14 +60,14 @@ All labs run **locally for free**. Cloud costs if you deploy:
 
 ## 🫏 The Donkey Analogy — Understanding Phase 1 Multi-Agent Flow
 
-Picture a donkey relay team instead of one donkey:
-
-- Researcher donkey gathers raw packages.
-- Analyst donkey organizes and interprets them.
-- Writer donkey converts them into a deliverable.
-- Critic donkey inspects quality before release.
-
-Phase 1 verifies this relay, the provider abstraction, and task persistence.
+| Metric | 🫏 Donkey Analogy | What It Means for Multi-Agent | How It's Calculated |
+|--------|-------------------|-------------------------------|---------------------|
+| **Agent Specialization** | Each donkey has a role — researcher, analyst, writer, critic | Agents are purpose-built with specific system prompts and capabilities | Count distinct agent roles → verify each produces role-appropriate output |
+| **Relay Handoff** | Researcher → Analyst → Writer → Critic pipeline | Output of one agent becomes input to the next in a defined sequence | Trace task through agent chain → verify context propagation at each step |
+| **Quality Gate** | Critic donkey inspects quality before release | Final agent scores/reviews output before it reaches the user | Critic agent returns score (1–10) → pass if score ≥ threshold |
+| **Task Persistence** | Packages are stored at each station, not lost between villages | Async tasks survive restarts; status is queryable at any time | `POST /tasks` → `GET /tasks/{id}` → verify status transitions (pending → running → completed) |
+| **Provider Abstraction** | Same relay route works on any road network | Swap LLM provider without changing agent definitions or flow | Change `CLOUD_PROVIDER` → re-run same task → verify equivalent quality |
+| **Latency** | Total time for the relay team to finish the delivery | End-to-end time from task submission to final output | `completed_at − created_at` across all agent steps (ms) |
 
 ---
 
