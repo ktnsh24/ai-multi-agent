@@ -1,0 +1,35 @@
+services:
+  backend:
+    build: .
+    ports:
+      - "8400:8400"
+    environment:
+      - CLOUD_PROVIDER=local
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=sqlite+aiosqlite:///./data/multi_agent.db
+      - LOG_LEVEL=INFO
+    volumes:
+      - backend_data:/app/data
+    depends_on:
+      - redis
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8400
+      - NEXT_PUBLIC_WS_URL=ws://localhost:8400
+    depends_on:
+      - backend
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  backend_data:
