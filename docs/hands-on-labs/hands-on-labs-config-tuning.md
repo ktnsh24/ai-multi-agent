@@ -21,6 +21,7 @@
 - [Lab 11: Eval Thresholds](#lab-11-eval-thresholds)
 - [Lab 12: Agent Count Sweep](#lab-12-agent-count-sweep)
 - [Lab 13: Max Iterations Sweep](#lab-13-max-iterations-sweep)
+- [Lab 14: LLM-as-Judge Evaluation](#lab-14-llm-as-judge-evaluation--can-a-smarter-llm-grade-each-donkey-in-the-herd)
 
 ---
 
@@ -375,3 +376,64 @@ Cap iterations to the 95th-percentile of "successful" runs in your traces — hi
 
 ### 🫏 Donkey takeaway
 A short leash makes the donkey give up before reaching the door; a long leash lets it wander the same corridor twenty times getting nowhere.
+
+---
+
+## Lab 14: LLM-as-Judge Evaluation — "Can a smarter LLM grade each donkey in the herd?"
+
+**Config:** `EVAL_MODE` (default: `rule_based`)
+**What it controls:** Whether evaluation uses Python rules (cheap, deterministic) or a second LLM call (expensive, semantic) — and in multi-agent, whether the judge scores EACH agent's contribution or only the final stitched answer.
+**Hypothesis:** Rule-based eval misses semantic hallucinations and cannot tell WHICH agent in the herd hallucinated. LLM-as-judge catches both — and pinpoints the bad donkey — at ~$0.001/eval per agent.
+
+### Why this matters
+Rule-based evaluation (`EVAL_MODE=rule_based`) splits the final answer into sentences, extracts keywords, and checks them against retrieved chunks. It's free and instant — but in a multi-agent flow it CANNOT tell whether the researcher invented a fact, the writer paraphrased it badly, or the critic missed it.
+
+LLM-as-judge (`EVAL_MODE=llm_judge`) sends each agent's intermediate output (researcher notes, writer draft, critic verdict, final stitched answer) to a second cheap LLM (e.g. Claude Haiku, GPT-4o-mini) with a structured rubric. It catches semantic hallucinations rules miss AND attributes the mistake to the right agent — which is exactly what you need to debug a herd.
+
+### Setup
+1. Add `EVAL_MODE=rule_based` to `.env`
+2. Pick a "judge" LLM in `.env`:
+   - Local: `JUDGE_LLM_PROVIDER=ollama` + `JUDGE_LLM_MODEL=llama3.2`
+   - AWS: `JUDGE_LLM_PROVIDER=bedrock` + `JUDGE_LLM_MODEL=anthropic.claude-haiku-...`
+   - Azure: `JUDGE_LLM_PROVIDER=azure_openai` + `JUDGE_LLM_MODEL=gpt-4o-mini`
+3. Implement the per-agent judge prompt (see template below)
+4. Run Q1–Q3 with both modes, varying `AGENT_COUNT` (1, 2, 4) so you can see whether the judge agrees that more agents = better per-agent quality
+5. Compare scores per agent and on the final answer
+
+### The judge prompt template (per agent)
+```text
+You are a strict evaluator of one agent in a multi-agent RAG flow. Given:
+- QUESTION: {question}
+- RETRIEVED_CONTEXT: {chunks}
+- AGENT_ROLE: {role}            # researcher | writer | critic | planner
+- AGENT_OUTPUT: {agent_output}
+- FINAL_ANSWER: {final_answer}
+
+Score this agent's contribution on:
+1. faithfulness (0.0–1.0): Did every claim in AGENT_OUTPUT come from RETRIEVED_CONTEXT (or upstream agent outputs you can see)?
+2. role_fit (0.0–1.0): Did the agent do its job (researcher researched, writer wrote, critic critiqued)?
+3. final_contribution (0.0–1.0): Did this agent's output materially improve the FINAL_ANSWER?
+
+Return strict JSON: {"faithfulness": 0.x, "role_fit": 0.x, "final_contribution": 0.x, "unsupported_claims": ["..."]}
+```
+
+### Results table (fill in as you run)
+| Question | AGENT_COUNT | Rule-based faithfulness (final) | LLM-judge faithfulness (final) | Worst agent (LLM-judge) | Why? |
+|---|---|---|---|---|---|
+| Q1 (clean) | 2 | ___ | ___ | ___ | ___ |
+| Q2 (paraphrased hallucination) | 2 | ___ | ___ | ___ | LLM-judge catches it; rules miss it |
+| Q3 (out-of-scope) | 4 | ___ | ___ | ___ | Both should score low; judge says which agent forced it |
+
+### Cost comparison
+| Mode | Cost per eval | Latency added | Determinism |
+|---|---|---|---|
+| `rule_based` | €0 | ~1ms | ✅ Same input → same score |
+| `llm_judge` (Haiku, final-only) | ~$0.001 | ~500–1500ms | ❌ May vary slightly |
+| `llm_judge` (Haiku, per-agent × 4) | ~$0.004 | ~2–6s | ❌ May vary |
+| `llm_judge` (GPT-4o, per-agent × 4) | ~$0.04 | ~4–12s | ❌ May vary |
+
+### What we learned
+Rule-based eval is the right default — it's free, fast, and catches obvious failures. Per-agent LLM-as-judge is the right tool for debugging which donkey in the herd is the weak link. Production pattern: run rule-based on every request, run final-answer LLM-judge on samples flagged as marginal, run per-agent LLM-judge only on a daily nightly batch over the golden dataset. Cost scales with `AGENT_COUNT` — never run per-agent judge on 100% of traffic.
+
+### 🫏 Donkey takeaway
+Rule-based eval is a clipboard-with-checkboxes the stable hand uses on every delivery. LLM-as-judge is the senior trainer who comes in once a week, watches each donkey in the herd, and tells you which one keeps stuffing the wrong parcels in its backpack. The clipboard tells you the herd failed; the trainer tells you whose fault it was.
