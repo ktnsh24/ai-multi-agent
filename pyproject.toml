@@ -2,7 +2,7 @@
 name = "ai-multi-agent"
 version = "0.1.0"
 description = "Multi-agent collaboration platform with CrewAI, WebSockets, and Next.js frontend"
-authors = ["Ketan <ketan@odido.nl>"]
+authors = ["Ketan Sahu <ktnsh24@users.noreply.github.com>"]
 readme = "README.md"
 packages = [{include = "src"}]
 
