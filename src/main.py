@@ -80,3 +80,16 @@ def create_app() -> FastAPI:
 def get_ws_manager():
     """Helper to access WebSocket manager from routes."""
     pass
+
+
+def start() -> None:
+    """CLI entry point for `poetry run start` — launches uvicorn."""
+    import uvicorn
+
+    uvicorn.run(
+        "src.main:create_app",
+        factory=True,
+        host="0.0.0.0",
+        port=8400,
+        reload=True,
+    )
