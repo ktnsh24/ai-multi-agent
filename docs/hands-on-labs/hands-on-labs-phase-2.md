@@ -13,14 +13,14 @@
 
 ---
 
-## 🫏 The Donkey Analogy — Understanding Phase 2 Real-Time Orchestration
+## 🚚 The Courier Analogy — Understanding Phase 2 Real-Time Orchestration
 
-| Metric | 🫏 Donkey Analogy | What It Means for Multi-Agent | How It's Calculated |
+| Metric | 🚚 Courier Analogy | What It Means for Multi-Agent | How It's Calculated |
 |--------|-------------------|-------------------------------|---------------------|
-| **WebSocket Events** | Live commentary channel — hear every play as it happens | Real-time agent events streamed to the frontend as they occur | Connect `ws://` → count event frames → verify agent-step events arrive in order |
-| **REST API** | Official scoreboard of task status | Standard async task pattern: submit → poll → retrieve result | `POST /tasks` → `GET /tasks/{id}` → check status field + result payload |
-| **Frontend Dashboard** | Audience view of events and results | User-facing UI showing live agent progress and final output | Load dashboard → verify WebSocket connection → check event rendering |
-| **Docker Stack** | Recreates the same stadium anywhere | Multi-service deployment (orchestrator + agents + frontend + DB) | `docker compose up` → verify all services healthy → run end-to-end task |
+| **WebSocket Events** | Live tracking feed — see every step as it happens | Real-time agent events streamed to the frontend as they occur | Connect `ws://` → count event frames → verify agent-step events arrive in order |
+| **REST API** | Official dispatch log of task status | Standard async task pattern: submit → poll → retrieve result | `POST /tasks` → `GET /tasks/{id}` → check status field + result payload |
+| **Frontend Dashboard** | Customer-facing tracking portal | User-facing UI showing live agent progress and final output | Load dashboard → verify WebSocket connection → check event rendering |
+| **Docker Stack** | Packages the whole dispatch centre for reproducible deployment | Multi-service deployment (orchestrator + agents + frontend + DB) | `docker compose up` → verify all services healthy → run end-to-end task |
 
 ---
 

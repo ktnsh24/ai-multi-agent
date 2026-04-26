@@ -4,7 +4,7 @@
 >
 > **How to run:** Each lab changes ONE config in `.env`, runs the same 3 questions, records the metrics, and explains the trade-off.
 >
-> **🫏 Donkey lens:** Each lab ends with a donkey takeaway summarising the trade-off in plain language.
+> **Courier lens:** Each lab ends with a courier takeaway summarising the trade-off in plain language.
 
 ## Table of Contents
 - [Setup — Common to all labs](#setup--common-to-all-labs)
@@ -21,7 +21,7 @@
 - [Lab 11: Eval Thresholds](#lab-11-eval-thresholds)
 - [Lab 12: Agent Count Sweep](#lab-12-agent-count-sweep)
 - [Lab 13: Max Iterations Sweep](#lab-13-max-iterations-sweep)
-- [Lab 14: LLM-as-Judge Evaluation](#lab-14-llm-as-judge-evaluation--can-a-smarter-llm-grade-each-donkey-in-the-herd)
+- [Lab 14: LLM-as-Judge Evaluation](#lab-14-llm-as-judge-evaluation--can-a-smarter-llm-grade-each-courier-in-the-fleet)
 
 ---
 
@@ -37,7 +37,7 @@
 
 ---
 
-## Lab 1: Chunk Size Sweep — "How big should each backpack pocket be?"
+## Lab 1: Chunk Size Sweep — "How large should each parcel be?"
 
 **Config:** `RAG_CHUNK_SIZE` (default: `500`)
 **What it controls:** Number of characters per chunk during ingestion.
@@ -59,12 +59,12 @@
 ### What we learned
 Multi-agent systems amplify chunk-size effects: each agent retrieves independently, so the wrong size compounds. Tune chunk size against the agent that does the heaviest retrieval (usually the researcher).
 
-### 🫏 Donkey takeaway
-Tiny pockets per donkey mean each one carries a clean fact, but the herd loses the storyline; giant pockets bury every donkey under irrelevant cargo.
+### 🚚 Courier takeaway
+Tiny parcels per courier carry clean facts but lose the storyline across handoffs; oversized parcels bury every courier in irrelevant context.
 
 ---
 
-## Lab 2: Chunk Overlap Sweep — "Should pockets share content at the edges?"
+## Lab 2: Chunk Overlap Sweep — "Should adjacent parcels share content at the edges?"
 
 **Config:** `RAG_CHUNK_OVERLAP` (default: `100`)
 **What it controls:** Characters duplicated between adjacent chunks.
@@ -86,12 +86,12 @@ Tiny pockets per donkey mean each one carries a clean fact, but the herd loses t
 ### What we learned
 10–20% overlap is the safe default; agents passing summaries between each other already provide some redundancy, so don't double-pay with huge overlap.
 
-### 🫏 Donkey takeaway
-Letting two backpack pockets share their last few sentences keeps a sentence cut in half intact — the donkey just carries those words twice.
+### 🚚 Courier takeaway
+Letting two adjacent parcels share their last few sentences keeps a split sentence intact — the courier just carries those words twice.
 
 ---
 
-## Lab 3: top_k Sweep — "How many pockets should each agent carry?"
+## Lab 3: top_k Sweep — "How many parcels should each agent carry?"
 
 **Config:** `RAG_TOP_K` (default: `5`)
 **What it controls:** Number of chunks pulled from the vector store per retrieval call.
@@ -113,8 +113,8 @@ Letting two backpack pockets share their last few sentences keeps a sentence cut
 ### What we learned
 top_k×agent_count is the real cost driver — 4 agents × top_k=10 = 40 chunks of context per question. Right-size top_k before scaling agents.
 
-### 🫏 Donkey takeaway
-One pocket is fast but risky; ten pockets per donkey × four donkeys = a stable full of cargo nobody reads.
+### 🚚 Courier takeaway
+One parcel is fast but risky; ten parcels per courier × four couriers = a depot full of context nobody reads.
 
 ---
 
@@ -139,12 +139,12 @@ One pocket is fast but risky; ten pockets per donkey × four donkeys = a stable 
 ### What we learned
 In multi-agent loops, high temperature compounds: a creative planner spawns creative subtasks that creative workers freelance even further. Reserve heat for the planner only.
 
-### 🫏 Donkey takeaway
-Cold donkeys execute the route exactly; warm donkeys start improvising — fine for one but chaos for a herd.
+### 🚚 Courier takeaway
+Precise couriers execute the route exactly; imprecise ones start improvising — fine for one but chaos for a fleet.
 
 ---
 
-## Lab 5: System Prompt Sweep — "Strict vs lax delivery note"
+## Lab 5: System Prompt Sweep — "Strict vs lax shipping manifest"
 
 **Config:** `SYSTEM_PROMPT` per agent (default: balanced)
 **What it controls:** Persona and rules each agent gets at every turn.
@@ -165,8 +165,8 @@ Cold donkeys execute the route exactly; warm donkeys start improvising — fine 
 ### What we learned
 The single biggest quality lever — sharper role boundaries dramatically cut redundant work and crosstalk between agents.
 
-### 🫏 Donkey takeaway
-A delivery note saying "you carry mail, not parcels" stops the donkey from hauling everything; vague notes turn every donkey into a generalist.
+### 🚚 Courier takeaway
+A shipping manifest saying "you carry research documents, not summaries" keeps each courier focused; vague manifests turn every courier into a generalist.
 
 ---
 
@@ -192,8 +192,8 @@ A delivery note saying "you carry mail, not parcels" stops the donkey from hauli
 ### What we learned
 Deploy-day decision; rebuild the index when changing. Always re-evaluate on the same golden set so the comparison is fair.
 
-### 🫏 Donkey takeaway
-High-resolution GPS pins each parcel exactly; low-resolution GPS lumps similar parcels at the same junction and the donkey grabs the wrong one.
+### 🚚 Courier takeaway
+High-resolution GPS pins each parcel exactly; low-resolution GPS lumps similar parcels at the same junction and the courier grabs the wrong one.
 
 ---
 
@@ -218,8 +218,8 @@ High-resolution GPS pins each parcel exactly; low-resolution GPS lumps similar p
 ### What we learned
 Reranker pays off most for the researcher agent, where the cost of a bad chunk cascades into bad summaries downstream.
 
-### 🫏 Donkey takeaway
-Before the herd leaves the warehouse, an inspector keeps only the pockets the donkeys actually need.
+### 🚚 Courier takeaway
+Before the fleet leaves the depot, an inspector keeps only the parcels the couriers actually need.
 
 ---
 
@@ -245,12 +245,12 @@ Before the herd leaves the warehouse, an inspector keeps only the pockets the do
 ### What we learned
 Hybrid wins when agents reference exact symbols (CrewAI, Bedrock model IDs). Pure vector blurs them; pure keyword loses paraphrases.
 
-### 🫏 Donkey takeaway
-The herd uses GPS to find the neighbourhood and a keyword radio to find the exact street name.
+### 🚚 Courier takeaway
+The fleet uses GPS to find the neighbourhood and a keyword radio to find the exact street name.
 
 ---
 
-## Lab 9: Query Rewriting On/Off — "Rewrite vague delivery notes"
+## Lab 9: Query Rewriting On/Off — "Rewrite vague shipping manifests"
 
 **Config:** `QUERY_REWRITING_ENABLED` (default: `false`)
 **What it controls:** Whether an LLM call rewrites the user query before vector search.
@@ -270,8 +270,8 @@ The herd uses GPS to find the neighbourhood and a keyword radio to find the exac
 ### What we learned
 Especially valuable in multi-agent: agents pass abbreviated handoffs to each other; rewriting them re-injects context the next agent lacks.
 
-### 🫏 Donkey takeaway
-Before the next donkey takes over, the smudged delivery note is rewritten in clear handwriting so the warehouse can find the parcel.
+### 🚚 Courier takeaway
+Before the next courier takes over, the vague manifest is rewritten clearly so the pickup locker can be located.
 
 ---
 
@@ -297,8 +297,8 @@ Before the next donkey takes over, the smudged delivery note is rewritten in cle
 ### What we learned
 Per-agent metadata filters are powerful: give the researcher web sources only, the summariser internal docs only, etc.
 
-### 🫏 Donkey takeaway
-Each donkey skips the whole warehouse and walks to its own aisle because the delivery note says "books, not groceries".
+### 🚚 Courier takeaway
+Each courier skips the whole depot and walks to its own aisle because the manifest says "books, not groceries".
 
 ---
 
@@ -322,12 +322,12 @@ Each donkey skips the whole warehouse and walks to its own aisle because the del
 ### What we learned
 Calibrate before trusting. In multi-agent, lax thresholds let one bad agent's bad chunk poison every downstream score without firing alerts.
 
-### 🫏 Donkey takeaway
-The report card itself can be lenient or strict — the herd did the same trip, but a strict teacher fails the delivery for the smallest miss.
+### 🚚 Courier takeaway
+The report card itself can be lenient or strict — the fleet made the same delivery run, but a strict auditor fails it for the smallest miss.
 
 ---
 
-## Lab 12: Agent Count Sweep — "How many donkeys in the herd?"
+## Lab 12: Agent Count Sweep — "How many couriers in the fleet?"
 
 **Config:** `AGENT_COUNT` (default: `2`)
 **What it controls:** Number of specialist agents spawned per task (e.g., researcher, writer, critic, …).
@@ -348,8 +348,8 @@ The report card itself can be lenient or strict — the herd did the same trip, 
 ### What we learned
 Two agents almost always beat one (planner + executor), four often beats two on quality but costs ~3× tokens. Past four, returns diminish quickly. Pick the smallest team that hits your quality bar.
 
-### 🫏 Donkey takeaway
-One donkey delivers everything; four donkeys split the route and finish faster — but they spend half the day talking to each other instead of walking.
+### 🚚 Courier takeaway
+One courier delivers everything; four couriers split the route and finish faster — but they spend half the time in handoff meetings instead of driving.
 
 ---
 
@@ -374,21 +374,21 @@ One donkey delivers everything; four donkeys split the route and finish faster �
 ### What we learned
 Cap iterations to the 95th-percentile of "successful" runs in your traces — high enough to finish real tasks, low enough that a stuck agent gets killed before burning tokens.
 
-### 🫏 Donkey takeaway
-A short leash makes the donkey give up before reaching the door; a long leash lets it wander the same corridor twenty times getting nowhere.
+### 🚚 Courier takeaway
+A short dispatch limit makes the courier give up before finishing the route; a long one lets them circle the same block twenty times getting nowhere.
 
 ---
 
-## Lab 14: LLM-as-Judge Evaluation — "Can a smarter LLM grade each donkey in the herd?"
+## Lab 14: LLM-as-Judge Evaluation — "Can a smarter LLM grade each courier in the fleet?"
 
 **Config:** `EVAL_MODE` (default: `rule_based`)
 **What it controls:** Whether evaluation uses Python rules (cheap, deterministic) or a second LLM call (expensive, semantic) — and in multi-agent, whether the judge scores EACH agent's contribution or only the final stitched answer.
-**Hypothesis:** Rule-based eval misses semantic hallucinations and cannot tell WHICH agent in the herd hallucinated. LLM-as-judge catches both — and pinpoints the bad donkey — at ~$0.001/eval per agent.
+**Hypothesis:** Rule-based eval misses semantic hallucinations and cannot tell WHICH agent in the fleet hallucinated. LLM-as-judge catches both — and pinpoints the underperforming courier — at ~$0.001/eval per agent.
 
 ### Why this matters
 Rule-based evaluation (`EVAL_MODE=rule_based`) splits the final answer into sentences, extracts keywords, and checks them against retrieved chunks. It's free and instant — but in a multi-agent flow it CANNOT tell whether the researcher invented a fact, the writer paraphrased it badly, or the critic missed it.
 
-LLM-as-judge (`EVAL_MODE=llm_judge`) sends each agent's intermediate output (researcher notes, writer draft, critic verdict, final stitched answer) to a second cheap LLM (e.g. Claude Haiku, GPT-4o-mini) with a structured rubric. It catches semantic hallucinations rules miss AND attributes the mistake to the right agent — which is exactly what you need to debug a herd.
+LLM-as-judge (`EVAL_MODE=llm_judge`) sends each agent's intermediate output (researcher notes, writer draft, critic verdict, final stitched answer) to a second cheap LLM (e.g. Claude Haiku, GPT-4o-mini) with a structured rubric. It catches semantic hallucinations rules miss AND attributes the mistake to the right agent — which is exactly what you need to debug a fleet.
 
 ### Setup
 1. Add `EVAL_MODE=rule_based` to `.env`
@@ -433,7 +433,7 @@ Return strict JSON: {"faithfulness": 0.x, "role_fit": 0.x, "final_contribution":
 | `llm_judge` (GPT-4o, per-agent × 4) | ~$0.04 | ~4–12s | ❌ May vary |
 
 ### What we learned
-Rule-based eval is the right default — it's free, fast, and catches obvious failures. Per-agent LLM-as-judge is the right tool for debugging which donkey in the herd is the weak link. Production pattern: run rule-based on every request, run final-answer LLM-judge on samples flagged as marginal, run per-agent LLM-judge only on a daily nightly batch over the golden dataset. Cost scales with `AGENT_COUNT` — never run per-agent judge on 100% of traffic.
+Rule-based eval is the right default — it's free, fast, and catches obvious failures. Per-agent LLM-as-judge is the right tool for debugging which courier in the fleet is the weak link. Production pattern: run rule-based on every request, run final-answer LLM-judge on samples flagged as marginal, run per-agent LLM-judge only on a daily nightly batch over the golden dataset. Cost scales with `AGENT_COUNT` — never run per-agent judge on 100% of traffic.
 
-### 🫏 Donkey takeaway
-Rule-based eval is a clipboard-with-checkboxes the stable hand uses on every delivery. LLM-as-judge is the senior trainer who comes in once a week, watches each donkey in the herd, and tells you which one keeps stuffing the wrong parcels in its backpack. The clipboard tells you the herd failed; the trainer tells you whose fault it was.
+### 🚚 Courier takeaway
+Rule-based eval is a clipboard-with-checkboxes the dispatcher uses on every delivery. LLM-as-judge is the senior auditor who comes in once a week, reviews each courier in the fleet, and tells you which one keeps picking up the wrong parcels. The clipboard tells you the fleet failed; the auditor tells you whose fault it was.
