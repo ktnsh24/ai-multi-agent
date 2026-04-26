@@ -5,8 +5,6 @@ from datetime import datetime
 from uuid import uuid4
 
 from src.models import (
-    AgentRole,
-    CrewMode,
     TaskRequest,
     TaskResponse,
     TaskResult,
@@ -19,16 +17,13 @@ class BaseTaskStore(ABC):
     """Abstract base class for task storage."""
 
     @abstractmethod
-    async def create_task(self, request: TaskRequest) -> TaskResponse:
-        ...
+    async def create_task(self, request: TaskRequest) -> TaskResponse: ...
 
     @abstractmethod
-    async def get_task(self, task_id: str) -> TaskResult | None:
-        ...
+    async def get_task(self, task_id: str) -> TaskResult | None: ...
 
     @abstractmethod
-    async def list_tasks(self, limit: int = 20) -> list[TaskSummary]:
-        ...
+    async def list_tasks(self, limit: int = 20) -> list[TaskSummary]: ...
 
     @abstractmethod
     async def update_task(
@@ -39,12 +34,10 @@ class BaseTaskStore(ABC):
         agent_outputs: dict[str, str] | None = None,
         iterations: int = 0,
         latency_ms: float = 0.0,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @abstractmethod
-    async def delete_task(self, task_id: str) -> bool:
-        ...
+    async def delete_task(self, task_id: str) -> bool: ...
 
 
 class InMemoryTaskStore(BaseTaskStore):
@@ -100,9 +93,7 @@ class InMemoryTaskStore(BaseTaskStore):
         )
 
     async def list_tasks(self, limit: int = 20) -> list[TaskSummary]:
-        sorted_tasks = sorted(
-            self.tasks.values(), key=lambda t: t["created_at"], reverse=True
-        )
+        sorted_tasks = sorted(self.tasks.values(), key=lambda t: t["created_at"], reverse=True)
         return [
             TaskSummary(
                 task_id=t["task_id"],

@@ -1,6 +1,5 @@
 """Task management routes."""
 
-import asyncio
 import logging
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Request

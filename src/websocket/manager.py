@@ -1,9 +1,6 @@
 """WebSocket manager for real-time agent events."""
 
-import asyncio
-import json
 import logging
-from typing import Any
 
 from fastapi import WebSocket
 

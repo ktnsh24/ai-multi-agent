@@ -6,9 +6,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.agents.crew import CrewOrchestrator
 from src.config import Settings
 from src.llm.provider import create_llm_provider
-from src.agents.crew import CrewOrchestrator
 from src.tasks.store import create_task_store
 from src.websocket.manager import WebSocketManager
 

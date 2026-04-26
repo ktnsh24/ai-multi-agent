@@ -6,8 +6,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-
 # ─── Enums ─────────────────────────────────────────────────────
+
 
 class TaskStatus(str, Enum):
     PENDING = "pending"
@@ -42,6 +42,7 @@ class EventType(str, Enum):
 
 # ─── Request Models ────────────────────────────────────────────
 
+
 class TaskRequest(BaseModel):
     """Request to submit a new task for the crew."""
 
@@ -56,6 +57,7 @@ class TaskRequest(BaseModel):
 
 
 # ─── Response Models ───────────────────────────────────────────
+
 
 class TaskResponse(BaseModel):
     """Response after submitting a task."""
@@ -97,6 +99,7 @@ class TaskSummary(BaseModel):
 
 # ─── WebSocket Events ──────────────────────────────────────────
 
+
 class AgentEvent(BaseModel):
     """Real-time event from agent execution."""
 
@@ -109,6 +112,7 @@ class AgentEvent(BaseModel):
 
 
 # ─── Health Model ──────────────────────────────────────────────
+
 
 class HealthStatus(BaseModel):
     status: str = "healthy"

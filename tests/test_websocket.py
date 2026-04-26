@@ -1,7 +1,8 @@
 """Tests for WebSocket manager."""
 
+from unittest.mock import AsyncMock
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock
 
 from src.models import AgentEvent, AgentRole, EventType
 from src.websocket.manager import WebSocketManager

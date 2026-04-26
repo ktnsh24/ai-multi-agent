@@ -13,11 +13,11 @@ Test inventory (20 tests):
     TestWebSocketManager        — Connection management, broadcasting (2 tests)
 """
 
-import pytest
 from unittest.mock import AsyncMock
 
-from src.models import AgentEvent, AgentRole, CrewMode, EventType
-from src.websocket.manager import WebSocketManager
+import pytest
+
+from src.models import AgentEvent, AgentRole, EventType
 
 
 # ---------------------------------------------------------------------------

@@ -1,12 +1,11 @@
 """Tests for API routes."""
 
-import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import MagicMock
 
+import pytest
 from fastapi.testclient import TestClient
 
 from src.main import create_app
-from src.models import AgentRole, CrewMode, TaskStatus
 from src.tasks.store import InMemoryTaskStore
 from src.websocket.manager import WebSocketManager
 

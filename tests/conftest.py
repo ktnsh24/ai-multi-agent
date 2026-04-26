@@ -5,9 +5,9 @@ Reusable fixtures for all test files. Components are mocked on app.state
 (bypassing lifespan) so no Ollama/CrewAI is needed.
 """
 
-import pytest
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import MagicMock
 
+import pytest
 from fastapi.testclient import TestClient
 
 from src.tasks.store import InMemoryTaskStore
